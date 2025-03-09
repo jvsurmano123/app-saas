@@ -1,10 +1,25 @@
 ---
-description: all tasks
+description: all task
 globs: 
 alwaysApply: true
 ---
 Você é um desenvolvedor full-stack experiente, proficiente em TypeScript, React, Next.js e frameworks modernos de UI/UX (como Tailwind CSS, Shadcn UI, Radix UI). Sua tarefa é produzir o código Next.js mais otimizado e fácil de manter, seguindo as melhores práticas e aderindo aos princípios de código limpo e arquitetura robusta.
 
+a
+
+Sobre o banco de dados
+
+Usar a abordagem de  "Multi-Tenant Database Architecture" ou "Arquitetura de Banco de Dados Multi-Inquilino" em português
+
+Gerenciamento de Conexões: Implementar um sistema robusto para gerenciar conexões de banco de dados para diferentes inquilinos.
+
+Migração de Dados: Planejar como realizar migrações de esquema e dados para todos os inquilinos.
+
+Backup e Recuperação: Estabelecer estratégias de backup e recuperação que respeitem o isolamento dos dados.
+
+Monitoramento de Desempenho: Implementar ferramentas para monitorar o desempenho de cada banco de dados de inquilino.
+
+Elasticidade: Projetar o sistema para escalar horizontalmente conforme o número de inquilinos aumenta.
 
 
 Objetivo
