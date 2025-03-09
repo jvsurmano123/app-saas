@@ -1,0 +1,422 @@
+---
+description: all tasks
+globs: 
+alwaysApply: true
+---
+
+1. Visão Geral
+ VetSistema é uma plataforma SaaS (Software as a Service) web desenvolvida em Next.js, projetada para auxiliar médicos veterinários e clínicas veterinárias na gestão eficiente de suas operações diárias.
+
+
+ 
+2. Funcionalidades Principais
+2.1 Gestão de Pacientes
+
+Cadastro e atualização de dados dos animais
+Histórico médico completo
+Agendamento de consultas e procedimentos
+Lembretes de vacinação e vermifugação
+
+2.2 Prontuário Eletrônico
+
+Registro de consultas
+Prescrição de medicamentos
+Solicitação e resultados de exames
+Anexo de imagens e documentos
+
+2.3 Agendamento
+
+Calendário de consultas e procedimentos
+Confirmação automática por e-mail/SMS
+Gestão de disponibilidade dos veterinários
+
+2.4 Gestão Financeira
+
+Controle de pagamentos
+Geração de faturas e recibos
+Relatórios financeiros
+
+2.5 Estoque e Farmácia
+
+Controle de estoque de medicamentos e produtos
+Alerta de estoque baixo
+Registro de lotes e validades
+
+2.6 Comunicação
+
+Chat interno entre equipe
+Envio de notificações para clientes
+Portal do cliente para acesso a informações
+
+2.7 Relatórios e Análises
+
+Dashboards personalizáveis
+Relatórios de desempenho
+Análise de tendências e sazonalidade
+
+2.8 Gestão de Equipe
+
+Controle de acesso e permissões
+Registro de atividades dos usuários
+Avaliação de desempenho
+
+3. Organização das Rotas
+/
+├── auth/
+│   ├── login
+│   ├── register
+│   └── forgot-password
+├── dashboard
+├── patients/
+│   ├── [id]
+│   ├── new
+│   └── list
+├── appointments/
+│   ├── [id]
+│   ├── new
+│   └── calendar
+├── medical-records/
+│   ├── [id]
+│   └── new
+├── inventory/
+│   ├── list
+│   ├── new
+│   └── [id]
+├── finance/
+│   ├── invoices
+│   ├── payments
+│   └── reports
+├── team/
+│   ├── list
+│   ├── [id]
+│   └── new
+├── settings/
+│   ├── profile
+│   ├── clinic
+│   └── integrations
+├── reports/
+│   ├── performance
+│   ├── financial
+│   └── custom
+└── help
+
+4. Descrição das Páginas
+
+Página Inicial (/): Landing page com informações sobre o SaaS e opção de login/registro.
+
+2. Autenticação (/auth):
+
+
+
+- /login: Página de login para usuários existentes.
+
+
+
+
+/register: Página de registro para novos usuários.
+/forgot-password: Recuperação de senha.
+
+
+Dashboard (/dashboard): Visão geral das principais métricas e atividades recentes.
+
+4. Pacientes (/patients):
+
+
+
+- /patients/[id]: Detalhes do paciente, histórico e opções de edição.
+
+
+
+
+/patients/new: Formulário para cadastro de novo paciente.
+/patients/list: Lista de todos os pacientes cadastrados.
+
+5. Agendamentos (/appointments):
+
+
+
+- /appointments/[id]: Detalhes de uma consulta específica.
+
+
+
+
+/appointments/new: Agendamento de nova consulta.
+/appointments/calendar: Visualização do calendário de consultas.
+
+6. Prontuários (/medical-records):
+
+
+
+- /medical-records/[id]: Visualização e edição de prontuário específico.
+
+
+
+
+/medical-records/new: Criação de novo registro médico.
+
+7. Estoque (/inventory):
+
+
+
+- /inventory/list: Lista de todos os itens em estoque.
+
+
+
+
+/inventory/new: Adição de novo item ao estoque.
+/inventory/[id]: Detalhes e edição de item específico.
+
+8. Finanças (/finance):
+
+
+
+- /finance/invoices: Gerenciamento de faturas.
+
+
+
+
+/finance/payments: Registro e controle de pagamentos.
+/finance/reports: Relatórios financeiros.
+
+9. Equipe (/team):
+
+
+
+- /team/list: Lista de todos os membros da equipe.
+
+
+
+
+/team/[id]: Perfil e configurações de membro específico.
+/team/new: Adição de novo membro à equipe.
+
+10. Configurações (/settings):
+
+
+
+- /settings/profile: Configurações do perfil do usuário.
+
+
+
+- **/settings/clinic**: Configurações da clínica.
+- **/settings/integrations**: Integrações com outros sistemas.
+
+11. Relatórios (/reports):
+
+
+
+- /reports/performance: Relatórios de desempenho da clínica.
+
+
+
+- **/reports/financial**: Relatórios financeiros detalhados.
+- **/reports/custom**: Criação de relatórios personalizados.
+
+
+Ajuda (/help): Centro de suporte e documentação do sistema.
+
+Entendido. Vou criar uma descrição técnica do projeto, incluindo a informação de que usaremos o Supabase como banco de dados. Isso ajudará o desenvolvedor a entender melhor a estrutura e as tecnologias envolvidas no projeto.
+VetCare: SaaS de Gestão para Clínicas Veterinárias
+Descrição Técnica do Projeto
+Visão Geral
+VetCare é uma aplicação SaaS (Software as a Service) web desenvolvida para gerenciamento de clínicas veterinárias. O projeto utiliza Next.js como framework principal, oferecendo uma experiência de usuário moderna e responsiva, com recursos avançados de renderização do lado do servidor (SSR) e geração estática (SSG).
+Stack Tecnológica Principal
+
+Frontend e Backend: Next.js (React framework)
+Linguagem de Programação: TypeScript
+Banco de Dados e Autenticação: Supabase
+Estilização: Tailwind CSS
+Gerenciamento de Estado: Zustand
+Formulários: React Hook Form com Zod para validação
+Componentes de UI: Shadcn UI (baseado em Radix UI)
+
+Arquitetura
+1. Frontend:
+
+
+
+- Utiliza a arquitetura de páginas e componentes do Next.js.
+
+
+
+
+Implementa React Server Components para otimização de performance.
+Usa sistema de roteamento dinâmico do Next.js para navegação eficiente.
+
+2. Backend:
+
+
+
+- Aproveita as API Routes do Next.js para criar endpoints serverless.
+
+
+
+
+Integra-se com Supabase para operações de banco de dados e autenticação.
+
+3. Banco de Dados:
+
+
+
+- Supabase (PostgreSQL) para armazenamento de dados estruturados.
+
+
+
+
+Utiliza recursos do Supabase como Realtime para atualizações em tempo real.
+
+4. Autenticação e Autorização:
+
+
+
+- Sistema de autenticação do Supabase com suporte a múltiplos métodos (email/senha, OAuth).
+
+
+
+
+Implementação de controle de acesso baseado em funções (RBAC).
+
+5. APIs e Integrações:
+
+
+
+- RESTful APIs para comunicação entre frontend e backend.
+
+
+
+
+Possíveis integrações com serviços externos (ex: gateway de pagamento, serviços de email).
+
+Funcionalidades Principais e Considerações Técnicas
+1. Gestão de Pacientes e Prontuários:
+
+
+
+- Modelagem de dados complexa no Supabase para representar animais, histórico médico, e relacionamentos.
+
+
+
+
+Implementação de busca em tempo real usando Supabase Realtime.
+
+2. Agendamento:
+
+
+
+- Sistema de calendário interativo usando bibliotecas como react-big-calendar.
+
+
+
+
+Lógica de back-end para evitar conflitos de agendamento.
+
+3. Gestão Financeira:
+
+
+
+- Integração com APIs de processamento de pagamentos.
+
+
+
+
+Geração de relatórios financeiros utilizando bibliotecas de visualização de dados.
+
+4. Estoque e Farmácia:
+
+
+
+- Sistema de rastreamento de inventário em tempo real.
+
+
+
+
+Alertas automáticos para estoque baixo ou produtos próximos da validade.
+
+5. Relatórios e Análises:
+
+
+
+- Utilização de bibliotecas de visualização de dados como Chart.js ou D3.js.
+
+
+
+
+Implementação de queries complexas no Supabase para agregação de dados.
+
+6. Comunicação:
+
+
+
+- Integração com serviços de email/SMS para notificações.
+
+
+
+
+Possível implementação de chat em tempo real usando Supabase Realtime.
+
+Considerações de Desenvolvimento
+1. Segurança:
+
+
+
+- Implementação de práticas de segurança robustas, incluindo sanitização de input e proteção contra CSRF.
+
+
+
+
+Utilização das funcionalidades de segurança do Supabase para autenticação e autorização.
+
+2. Performance:
+
+
+
+- Otimização de queries no Supabase para garantir resposta rápida.
+
+
+
+
+Implementação de estratégias de caching, tanto no cliente quanto no servidor.
+
+3. Escalabilidade:
+
+
+
+- Arquitetura projetada para escalar horizontalmente.
+
+
+
+
+Utilização eficiente dos recursos serverless do Next.js e Supabase.
+
+4. Testes:
+
+
+
+- Implementação de testes unitários e de integração usando Jest e React Testing Library.
+
+
+
+
+Possível implementação de testes E2E com Cypress.
+
+5. CI/CD:
+
+
+
+- Configuração de pipeline de CI/CD, possivelmente usando GitHub Actions ou Vercel.
+
+
+
+6. Monitoramento e Logging:
+
+
+
+- Implementação de sistema de logging robusto.
+
+
+
+
+Integração com ferramentas de monitoramento de performance e erro (ex: Sentry).
+
+
+

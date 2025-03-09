@@ -1,0 +1,57 @@
+.auth-card {
+  isolation: isolate;
+}
+
+.auth-card-left {
+  position: relative;
+  z-index: 1;
+  background-image: 
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.8) 0%, transparent 60%),
+    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.8) 0%, transparent 60%);
+}
+
+.auth-card-right {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.auth-card-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+  z-index: -1;
+}
+
+/* Remover classes adicionadas automaticamente por extensões */
+body[cz-shortcut-listen],
+body.vsc-initialized {
+  min-height: 100vh;
+}
+
+/* Melhorias visuais para inputs e botões */
+.auth-card input {
+  transition: all 0.2s ease;
+  border-color: #E5E7EB;
+}
+
+.auth-card input:hover {
+  border-color: #D1D5DB;
+}
+
+.auth-card input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.auth-card button {
+  transition: all 0.2s ease;
+}
+
+.auth-card button:active {
+  transform: translateY(1px);
+} 
