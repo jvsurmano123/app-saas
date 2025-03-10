@@ -5,6 +5,7 @@ import { PatientList } from '@/components/patients/patient-list';
 import { PatientSearch } from '@/components/patients/patient-search';
 import { PatientFilters } from '@/components/patients/patient-filters';
 import { PatientKanban } from '@/components/patients/patient-kanban';
+import { PatientStats } from '@/components/patients/patient-stats';
 import { NewPatientDialog } from '@/components/patients/new-patient-dialog';
 import { usePatients } from '@/hooks/use-patients';
 import { Button } from '@/components/ui/button';
@@ -39,10 +40,6 @@ function PatientsContent() {
   const handlePatientMove = async (patientId: string, newStatus: string) => {
     try {
       // Como estamos usando dados mockados, vamos apenas simular a atualização
-      // Em produção, você usaria a função updatePatient
-      // await updatePatient(patientId, { status: newStatus });
-      
-      // Atualiza o status do paciente nos dados mockados
       const patientIndex = mockPatients.findIndex(p => p.id === patientId);
       if (patientIndex !== -1) {
         mockPatients[patientIndex] = {
@@ -95,6 +92,8 @@ function PatientsContent() {
             </NewPatientDialog>
           </div>
         </div>
+
+        <PatientStats patients={patients} />
 
         <Separator />
 

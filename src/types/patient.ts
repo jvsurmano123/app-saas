@@ -1,19 +1,22 @@
+export type PatientStatus = 'aguardando' | 'em_tratamento' | 'alta' | 'cancelado';
+
 export interface Patient {
   id: string;
   name: string;
-  species: 'dog' | 'cat' | 'bird' | 'other';
+  species: string;
   breed: string;
+  age: number;
   gender: 'male' | 'female';
-  birthDate: string;
-  weight: number;
-  status: 'waiting' | 'in_consultation' | 'exams' | 'surgery' | 'completed' | 'inactive';
-  microchip?: string;
-  allergies?: string;
-  observations?: string;
-  ownerId: string;
+  ownerName: string;
+  ownerPhone: string;
+  ownerEmail: string;
+  status: PatientStatus;
   createdAt: string;
   updatedAt: string;
-  owner_name?: string;
+  lastVisit?: string;
+  nextVisit?: string;
+  notes?: string;
+  imageUrl?: string;
 }
 
 export interface Owner {
