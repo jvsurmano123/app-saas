@@ -9,4 +9,9 @@ export interface Profile {
 
 export interface AuthError {
   message: string
-} 
+}
+
+// Exportando tipos de agendamentos
+export * from './appointment';
+export * from './patient';
+export * from './medical-record'; 
