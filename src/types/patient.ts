@@ -6,13 +6,14 @@ export interface Patient {
   gender: 'male' | 'female';
   birthDate: string;
   weight: number;
-  status: 'active' | 'inactive';
+  status: 'waiting' | 'in_consultation' | 'exams' | 'surgery' | 'completed' | 'inactive';
   microchip?: string;
   allergies?: string;
   observations?: string;
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+  owner_name?: string;
 }
 
 export interface Owner {
