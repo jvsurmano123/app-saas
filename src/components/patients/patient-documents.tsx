@@ -2,165 +2,89 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, FileText, Download, Printer, ExternalLink } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Download, FileText, Plus } from 'lucide-react';
 
 interface PatientDocumentsProps {
   patientId: string;
 }
 
-const documentData = [
+// TODO: Implementar busca dos documentos do paciente
+const mockDocuments = [
   {
-    id: 1,
-    type: 'prescription',
-    title: 'Receita - Prednisolona',
-    date: '01/02/2024',
-    createdBy: 'Dr. Carlos Santos',
-    status: 'active',
-    file: '/documents/prescription-01022024.pdf',
+    id: '1',
+    name: 'Carteira de Vacinação',
+    type: 'PDF',
+    uploadedAt: new Date(),
+    uploadedBy: 'Dr. João Silva',
+    size: '1.2 MB',
   },
   {
-    id: 2,
-    type: 'certificate',
-    title: 'Atestado de Saúde',
-    date: '10/03/2024',
-    createdBy: 'Dr. Carlos Santos',
-    status: 'active',
-    file: '/documents/certificate-10032024.pdf',
-  },
-  {
-    id: 3,
-    type: 'exam_request',
-    title: 'Solicitação de Exames',
-    date: '10/03/2024',
-    createdBy: 'Dr. Carlos Santos',
-    status: 'pending',
-    file: '/documents/exam-request-10032024.pdf',
-  },
-  {
-    id: 4,
-    type: 'vaccination',
-    title: 'Carteira de Vacinação',
-    date: '15/02/2024',
-    createdBy: 'Sistema',
-    status: 'active',
-    file: '/documents/vaccination-15022024.pdf',
+    id: '2',
+    name: 'Laudo Hemograma',
+    type: 'PDF',
+    uploadedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    uploadedBy: 'Dra. Maria Santos',
+    size: '856 KB',
   },
 ];
 
 export function PatientDocuments({ patientId }: PatientDocumentsProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Documentos
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Receitas, atestados e outros documentos
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Gerar Documento" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="prescription">Receita</SelectItem>
-              <SelectItem value="certificate">Atestado</SelectItem>
-              <SelectItem value="exam_request">Solicitação de Exame</SelectItem>
-              <SelectItem value="vaccination">Carteira de Vacinação</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Documento
-          </Button>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Documentos Recentes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {documentData.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-muted rounded-lg">
-                    <FileText className="h-5 w-5" />
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Documentos</CardTitle>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Adicionar Documento
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Adicionado por</TableHead>
+              <TableHead>Tamanho</TableHead>
+              <TableHead className="w-[100px]">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {mockDocuments.map((document) => (
+              <TableRow key={document.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    {document.name}
                   </div>
-                  <div>
-                    <p className="font-medium">{doc.title}</p>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>{doc.date}</span>
-                      <span>•</span>
-                      <span>{doc.createdBy}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {doc.status === 'pending' ? (
-                    <Badge variant="secondary">Pendente</Badge>
-                  ) : (
-                    <Badge variant="default" className="bg-green-600">Ativo</Badge>
-                  )}
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Printer className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                </TableCell>
+                <TableCell>{document.type}</TableCell>
+                <TableCell>
+                  {format(document.uploadedAt, 'dd/MM/yyyy', { locale: ptBR })}
+                </TableCell>
+                <TableCell>{document.uploadedBy}</TableCell>
+                <TableCell>{document.size}</TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="icon">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Modelos de Documentos</CardTitle>
-            <Button variant="outline">
-              Gerenciar Modelos
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <FileText className="h-8 w-8" />
-              <p>Receita Padrão</p>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <FileText className="h-8 w-8" />
-              <p>Atestado de Saúde</p>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <FileText className="h-8 w-8" />
-              <p>Solicitação de Exame</p>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 } 

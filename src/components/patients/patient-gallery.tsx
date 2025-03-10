@@ -1,107 +1,62 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Download, Trash2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Plus } from 'lucide-react';
 
 interface PatientGalleryProps {
   patientId: string;
 }
 
-const galleryData = [
+// TODO: Implementar busca das imagens do paciente
+const mockImages = [
   {
-    id: 1,
-    type: 'image',
-    url: '/gallery/image-1.jpg',
-    thumbnail: '/gallery/thumb-1.jpg',
-    date: '10/03/2024',
-    description: 'Foto da consulta - Dermatite',
-    tags: ['dermatite', 'consulta'],
+    id: "1",
+    url: "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?q=80&w=200&auto=format&fit=crop",
+    title: "Consulta de rotina",
+    date: new Date(),
+    type: "photo",
   },
   {
-    id: 2,
-    type: 'image',
-    url: '/gallery/image-2.jpg',
-    thumbnail: '/gallery/thumb-2.jpg',
-    date: '15/02/2024',
-    description: 'Radiografia Tórax',
-    tags: ['radiografia', 'tórax'],
-  },
-  {
-    id: 3,
-    type: 'video',
-    url: '/gallery/video-1.mp4',
-    thumbnail: '/gallery/thumb-3.jpg',
-    date: '01/02/2024',
-    description: 'Avaliação de marcha',
-    tags: ['ortopedia', 'marcha'],
+    id: "2",
+    url: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=200&auto=format&fit=crop",
+    title: "Raio-X Tórax",
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    type: "exam",
   },
 ];
 
 export function PatientGallery({ patientId }: PatientGalleryProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Galeria
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Fotos e vídeos do paciente
-          </p>
-        </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Galeria</CardTitle>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Adicionar Mídia
+          <Plus className="h-4 w-4 mr-2" />
+          Adicionar Imagem
         </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {galleryData.map((item) => (
-          <Card key={item.id} className="overflow-hidden group">
-            <div className="relative">
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {mockImages.map((image) => (
+            <div key={image.id} className="group relative aspect-square rounded-md overflow-hidden">
               <img
-                src={item.thumbnail}
-                alt={item.description}
-                className="w-full aspect-video object-cover"
+                src={image.url}
+                alt={image.title}
+                className="object-cover w-full h-full transition-transform group-hover:scale-105"
               />
-              {item.type === 'video' && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full border-2 flex items-center justify-center">
-                    <div className="w-0 h-0 border-t-8 border-t-transparent border-l-[16px] border-l-white border-b-8 border-b-transparent ml-1" />
-                  </div>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <div className="flex gap-2">
-                  <Button size="icon" variant="secondary">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="destructive">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end">
+                <p className="text-white font-medium">{image.title}</p>
+                <p className="text-white/80 text-sm">
+                  {format(image.date, "dd/MM/yyyy", { locale: ptBR })}
+                </p>
               </div>
             </div>
-            <CardContent className="p-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium truncate">{item.description}</p>
-                  <p className="text-sm text-muted-foreground">{item.date}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {item.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 } 

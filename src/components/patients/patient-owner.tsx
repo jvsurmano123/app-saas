@@ -1,67 +1,47 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, Mail, MapPin, ChevronRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Mail, Phone, User } from "lucide-react";
 
 interface PatientOwnerProps {
   patientId: string;
 }
 
+// TODO: Implementar busca dos dados do tutor
+const mockOwner = {
+  name: "João Silva",
+  email: "joao.silva@email.com",
+  phone: "(11) 99999-9999",
+  address: "Rua das Flores, 123 - São Paulo, SP",
+};
+
 export function PatientOwner({ patientId }: PatientOwnerProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Informações do Tutor</CardTitle>
+        <CardTitle>Tutor</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src="/placeholder-owner.jpg" alt="João Silva" />
-            <AvatarFallback>JS</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-medium">João Silva</p>
-            <p className="text-sm text-muted-foreground">Tutor Principal</p>
-          </div>
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">{mockOwner.name}</span>
         </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span>(11) 98765-4321</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Mail className="h-4 w-4 text-muted-foreground" />
-            <span>joao.silva@email.com</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span>Rua das Flores, 123 - São Paulo, SP</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <Button variant="link" className="p-0 h-auto" asChild>
+            <a href={`mailto:${mockOwner.email}`}>{mockOwner.email}</a>
+          </Button>
         </div>
-
-        <div className="space-y-3">
-          <p className="text-sm font-medium">Outros Pets</p>
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder-pet-2.jpg" alt="Luna" />
-              <AvatarFallback>LN</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <p className="text-sm font-medium">Luna</p>
-              <p className="text-xs text-muted-foreground">Felino • 2 anos</p>
-            </div>
-            <Button variant="ghost" size="icon">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="flex items-center gap-2">
+          <Phone className="h-4 w-4 text-muted-foreground" />
+          <Button variant="link" className="p-0 h-auto" asChild>
+            <a href={`tel:${mockOwner.phone}`}>{mockOwner.phone}</a>
+          </Button>
         </div>
-
-        <Button variant="outline" className="w-full">
-          Ver Cadastro Completo
-        </Button>
+        <p className="text-sm text-muted-foreground">
+          {mockOwner.address}
+        </p>
       </CardContent>
     </Card>
   );

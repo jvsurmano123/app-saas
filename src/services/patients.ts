@@ -62,33 +62,66 @@ export async function createPatient(data: NewPatientData) {
   }
 }
 
-export async function getPatients(search?: string) {
-  let query = supabase
-    .from('patients')
-    .select(`
-      *,
-      owner:owners (
-        name,
-        phone,
-        email
-      )
-    `)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false });
+interface GetPatientsParams {
+  search?: string;
+  filters?: {
+    status?: string;
+    species?: string;
+    breed?: string;
+  };
+  page?: number;
+  limit?: number;
+}
 
-  if (search) {
-    query = query.or(
-      `name.ilike.%${search}%,owner.name.ilike.%${search}%`
-    );
+export async function getPatients({
+  search = '',
+  filters = {},
+  page = 1,
+  limit = 10
+}: GetPatientsParams = {}) {
+  try {
+    let query = supabase
+      .from('patients')
+      .select('*', { count: 'exact' });
+
+    // Aplicar busca
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,owner_name.ilike.%${search}%`);
+    }
+
+    // Aplicar filtros
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+    if (filters.species) {
+      query = query.eq('species', filters.species);
+    }
+    if (filters.breed) {
+      query = query.eq('breed', filters.breed);
+    }
+
+    // Aplicar paginação
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    
+    query = query
+      .order('created_at', { ascending: false })
+      .range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    return {
+      patients: (data as Patient[]) || [],
+      total: count || 0
+    };
+  } catch (error) {
+    console.error('Erro ao buscar pacientes:', error);
+    throw error;
   }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error('Erro ao buscar pacientes');
-  }
-
-  return data;
 }
 
 export async function getPatientById(id: string) {

@@ -8,155 +8,168 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Patient } from '@/types/patient';
+import { formatDate } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Calendar, FileText, Mail } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Patient } from '@/types/patient';
+import { Badge } from '@/components/ui/badge';
 
 interface PatientListProps {
-  isLoading?: boolean;
   patients: Patient[];
+  isLoading: boolean;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export function PatientList({ isLoading, patients }: PatientListProps) {
+export function PatientList({
+  patients,
+  isLoading,
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PatientListProps) {
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      active: 'success',
+      inactive: 'secondary',
+    } as const;
+
+    const labels = {
+      active: 'Ativo',
+      inactive: 'Inativo',
+    } as const;
+
+    return (
+      <Badge variant={variants[status as keyof typeof variants]}>
+        {labels[status as keyof typeof labels]}
+      </Badge>
+    );
+  };
+
   if (isLoading) {
-    return <LoadingSkeleton />;
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Espécie</TableHead>
+                <TableHead>Raça</TableHead>
+                <TableHead>Tutor</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Data de Cadastro</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: 7 }).map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className="h-4 w-[100px]" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    );
+  }
+
+  if (patients.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">
+          Nenhum paciente encontrado
+        </h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Tente ajustar os filtros ou criar um novo paciente.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Paciente</TableHead>
-            <TableHead>Espécie</TableHead>
-            <TableHead>Raça</TableHead>
-            <TableHead>Tutor</TableHead>
-            <TableHead>Última Consulta</TableHead>
-            <TableHead className="w-[100px]">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {patients.length === 0 ? (
+    <div className="space-y-4">
+      <div className="rounded-lg border">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
-                Nenhum paciente encontrado
-              </TableCell>
+              <TableHead>Nome</TableHead>
+              <TableHead>Espécie</TableHead>
+              <TableHead>Raça</TableHead>
+              <TableHead>Tutor</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Data de Cadastro</TableHead>
+              <TableHead></TableHead>
             </TableRow>
-          ) : (
-            patients.map((patient) => (
+          </TableHeader>
+          <TableBody>
+            {patients.map((patient) => (
               <TableRow key={patient.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src="/placeholder-pet.jpg" alt={patient.name} />
-                      <AvatarFallback>
-                        {patient.name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{patient.name}</p>
-                      <p className="text-sm text-muted-foreground">ID: #{patient.id}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {patient.species === 'dog' && 'Canino'}
-                  {patient.species === 'cat' && 'Felino'}
-                  {patient.species === 'bird' && 'Ave'}
-                  {patient.species === 'other' && 'Outro'}
-                </TableCell>
+                <TableCell className="font-medium">{patient.name}</TableCell>
+                <TableCell>{patient.species}</TableCell>
                 <TableCell>{patient.breed}</TableCell>
-                <TableCell>{patient.owner?.name}</TableCell>
-                <TableCell>-</TableCell>
+                <TableCell>{patient.owner_name}</TableCell>
+                <TableCell>{getStatusBadge(patient.status)}</TableCell>
+                <TableCell>{formatDate(patient.created_at)}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
                         <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Abrir menu</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Agendar Consulta
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Abrir Prontuário
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Enviar Mensagem
+                      <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
+                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive">
+                        Excluir
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-function LoadingSkeleton() {
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Paciente</TableHead>
-            <TableHead>Espécie</TableHead>
-            <TableHead>Raça</TableHead>
-            <TableHead>Tutor</TableHead>
-            <TableHead>Última Consulta</TableHead>
-            <TableHead className="w-[100px]">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <TableRow key={i}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-32" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-20" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-8 w-8" />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="flex items-center justify-between px-2">
+        <div className="text-sm text-muted-foreground">
+          Página {currentPage} de {totalPages}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 } 

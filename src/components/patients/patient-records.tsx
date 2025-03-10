@@ -1,133 +1,90 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Save, Plus } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { FileText, Plus } from "lucide-react";
+import Link from "next/link";
 
 interface PatientRecordsProps {
   patientId: string;
 }
 
+// TODO: Implementar busca dos prontuários do paciente
+const mockRecords = [
+  {
+    id: "1",
+    date: new Date(),
+    type: "Consulta",
+    doctor: "Dr. João Silva",
+    diagnosis: "Gripe canina",
+    status: "Concluído",
+  },
+  {
+    id: "2",
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    type: "Retorno",
+    doctor: "Dra. Maria Santos",
+    diagnosis: "Acompanhamento pós-cirúrgico",
+    status: "Em andamento",
+  },
+];
+
 export function PatientRecords({ patientId }: PatientRecordsProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Prontuário
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Registro detalhado das consultas e procedimentos
-          </p>
-        </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Nova Entrada
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Prontuários</CardTitle>
+        <Button asChild>
+          <Link href={`/dashboard/medical-records/${patientId}/new-consultation`}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Consulta
+          </Link>
         </Button>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Nova Consulta - 10/03/2024</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label>Temperatura (°C)</Label>
-              <Input type="number" step="0.1" placeholder="38.5" />
-            </div>
-            <div className="space-y-2">
-              <Label>Freq. Cardíaca (bpm)</Label>
-              <Input type="number" placeholder="120" />
-            </div>
-            <div className="space-y-2">
-              <Label>Freq. Respiratória</Label>
-              <Input type="number" placeholder="20" />
-            </div>
-            <div className="space-y-2">
-              <Label>Peso (kg)</Label>
-              <Input type="number" step="0.1" placeholder="33.5" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Subjetivo (S)</Label>
-            <Textarea 
-              placeholder="Queixa principal e histórico relatado pelo tutor..."
-              className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Objetivo (O)</Label>
-            <Textarea 
-              placeholder="Achados do exame físico..."
-              className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Avaliação (A)</Label>
-            <Textarea 
-              placeholder="Impressão diagnóstica..."
-              className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Plano (P)</Label>
-            <Textarea 
-              placeholder="Conduta, prescrições e recomendações..."
-              className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button variant="outline">
-              Cancelar
-            </Button>
-            <Button>
-              <Save className="mr-2 h-4 w-4" />
-              Salvar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Histórico de Prontuários</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Exemplo de entrada anterior */}
-            <div className="border-l-2 border-muted pl-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">01/02/2024</p>
-                  <p className="font-medium">Consulta - Dermatite</p>
-                  <p className="text-sm text-muted-foreground">Dr. Carlos Santos</p>
-                </div>
-                <Button variant="ghost">Ver Detalhes</Button>
-              </div>
-            </div>
-
-            <div className="border-l-2 border-muted pl-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">15/01/2024</p>
-                  <p className="font-medium">Consulta de Rotina</p>
-                  <p className="text-sm text-muted-foreground">Dra. Ana Paula</p>
-                </div>
-                <Button variant="ghost">Ver Detalhes</Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Data</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Médico</TableHead>
+              <TableHead>Diagnóstico</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[100px]">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {mockRecords.map((record) => (
+              <TableRow key={record.id}>
+                <TableCell>
+                  {format(record.date, "dd/MM/yyyy", { locale: ptBR })}
+                </TableCell>
+                <TableCell>{record.type}</TableCell>
+                <TableCell>{record.doctor}</TableCell>
+                <TableCell>{record.diagnosis}</TableCell>
+                <TableCell>{record.status}</TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href={`/dashboard/medical-records/${patientId}/records/${record.id}`}>
+                      <FileText className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 } 

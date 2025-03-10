@@ -1,57 +1,119 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, Suspense, useState } from 'react';
 import { PatientList } from '@/components/patients/patient-list';
 import { PatientSearch } from '@/components/patients/patient-search';
 import { PatientFilters } from '@/components/patients/patient-filters';
+import { PatientKanban } from '@/components/patients/patient-kanban';
 import { NewPatientDialog } from '@/components/patients/new-patient-dialog';
-import { getPatients } from '@/services/patients';
-import { testSupabaseConnection } from '@/lib/supabase';
-import { toast } from 'sonner';
-import { Patient } from '@/types/patient';
+import { usePatients } from '@/hooks/use-patients';
+import { Button } from '@/components/ui/button';
+import { Plus, LayoutGrid, List } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export default function PatientsPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [search, setSearch] = useState('');
+function PatientsContent() {
+  const {
+    patients,
+    isLoading,
+    search,
+    setSearch,
+    filters,
+    setFilters,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    refreshPatients,
+  } = usePatients();
 
-  const loadPatients = async () => {
-    try {
-      // Testa a conexão com o Supabase primeiro
-      const isConnected = await testSupabaseConnection();
-      
-      if (!isConnected) {
-        toast.error('Erro de conexão com o banco de dados');
-        return;
-      }
-
-      const data = await getPatients(search);
-      setPatients(data);
-    } catch (error) {
-      console.error('Erro ao carregar pacientes:', error);
-      toast.error('Erro ao carregar pacientes');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [view, setView] = useState<'list' | 'kanban'>('kanban');
 
   useEffect(() => {
-    loadPatients();
-  }, [search]);
+    refreshPatients();
+  }, [search, filters, currentPage]);
+
+  const handlePatientMove = async (patientId: string, newStatus: string) => {
+    // TODO: Implementar atualização do status do paciente no banco de dados
+    console.log(`Movendo paciente ${patientId} para ${newStatus}`);
+    await refreshPatients();
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Pacientes</h1>
-        <NewPatientDialog onSuccess={loadPatients} />
-      </div>
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Pacientes</h1>
+            <p className="text-muted-foreground mt-1">
+              Gerencie todos os pacientes da clínica
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="border rounded-md p-1">
+              <Button
+                variant={view === 'list' ? 'default' : 'ghost'}
+                size="icon"
+                onClick={() => setView('list')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={view === 'kanban' ? 'default' : 'ghost'}
+                size="icon"
+                onClick={() => setView('kanban')}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+            </div>
+            <NewPatientDialog>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Paciente
+              </Button>
+            </NewPatientDialog>
+          </div>
+        </div>
 
-      <div className="flex items-center space-x-4">
-        <PatientSearch value={search} onChange={setSearch} />
-        <PatientFilters />
-      </div>
+        <Separator />
 
-      <PatientList isLoading={isLoading} patients={patients} />
+        <Card className="p-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <PatientSearch 
+              value={search} 
+              onChange={setSearch} 
+              className="md:max-w-xs" 
+            />
+            <PatientFilters 
+              filters={filters} 
+              onFiltersChange={setFilters} 
+            />
+          </div>
+        </Card>
+
+        {view === 'list' ? (
+          <PatientList 
+            isLoading={isLoading} 
+            patients={patients}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        ) : (
+          <PatientKanban 
+            patients={patients}
+            onPatientMove={handlePatientMove}
+          />
+        )}
+      </div>
     </div>
+  );
+}
+
+export default function PatientsPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <PatientsContent />
+    </Suspense>
   );
 } 
