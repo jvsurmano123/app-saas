@@ -12,17 +12,26 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const { signIn } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validação básica
+    if (!email || !password) {
+      setError('Por favor, preencha todos os campos')
+      return
+    }
+    
     setLoading(true)
+    setError('')
 
     try {
       await signIn(email, password)
-    } catch (error) {
-      console.error(error)
-      // Aqui você pode adicionar uma notificação de erro
+    } catch (error: any) {
+      console.error('Erro ao fazer login:', error)
+      setError(error?.message || 'Ocorreu um erro ao fazer login. Por favor, tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -81,6 +90,12 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
@@ -95,6 +110,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-11"
+              required
             />
           </div>
           <div className="space-y-2">
@@ -116,6 +132,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="h-11"
+              required
             />
           </div>
           <Button className="w-full h-11 text-[15px] font-medium shadow-md" disabled={loading}>
