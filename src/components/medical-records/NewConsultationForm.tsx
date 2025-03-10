@@ -1,10 +1,12 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
   Card,
   CardContent,
-  CardFooter,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,63 +19,115 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useState } from "react";
 
-const newConsultationSchema = z.object({
-  reason: z.string().min(1, "Informe o motivo da consulta"),
-  symptoms: z.string().min(1, "Informe os sintomas"),
-  diagnosis: z.string().min(1, "Informe o diagnóstico"),
+const consultationFormSchema = z.object({
+  reason: z.string().min(3, "Motivo deve ter pelo menos 3 caracteres"),
+  symptoms: z.string().min(3, "Sintomas devem ter pelo menos 3 caracteres"),
+  weight: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "Peso deve ser um número válido",
+  }),
+  temperature: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "Temperatura deve ser um número válido",
+  }),
+  heartRate: z.string().refine((val) => !isNaN(parseInt(val)), {
+    message: "Frequência cardíaca deve ser um número válido",
+  }),
+  respiratoryRate: z.string().refine((val) => !isNaN(parseInt(val)), {
+    message: "Frequência respiratória deve ser um número válido",
+  }),
   notes: z.string().optional(),
-  weight: z.string().min(1, "Informe o peso"),
-  temperature: z.string().min(1, "Informe a temperatura"),
-  heartRate: z.string().min(1, "Informe a frequência cardíaca"),
-  respiratoryRate: z.string().min(1, "Informe a frequência respiratória"),
-  bloodPressure: z.string().min(1, "Informe a pressão arterial"),
 });
 
-type NewConsultationForm = z.infer<typeof newConsultationSchema>;
+type ConsultationFormValues = z.infer<typeof consultationFormSchema>;
 
-export function NewConsultationForm() {
-  const form = useForm<NewConsultationForm>({
-    resolver: zodResolver(newConsultationSchema),
-    defaultValues: {
-      reason: "",
-      symptoms: "",
-      diagnosis: "",
-      notes: "",
-      weight: "",
-      temperature: "",
-      heartRate: "",
-      respiratoryRate: "",
-      bloodPressure: "",
-    },
+const defaultValues: Partial<ConsultationFormValues> = {
+  reason: "",
+  symptoms: "",
+  weight: "",
+  temperature: "",
+  heartRate: "",
+  respiratoryRate: "",
+  notes: "",
+};
+
+interface NewConsultationFormProps {
+  patientId: string;
+  onSubmit: (data: ConsultationFormValues) => void;
+}
+
+export function NewConsultationForm({ patientId, onSubmit }: NewConsultationFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<ConsultationFormValues>({
+    resolver: zodResolver(consultationFormSchema),
+    defaultValues,
   });
 
-  function onSubmit(data: NewConsultationForm) {
-    // TODO: Implementar o envio do formulário
-    console.log(data);
+  async function handleSubmit(data: ConsultationFormValues) {
+    setIsLoading(true);
+    try {
+      await onSubmit(data);
+    } catch (error) {
+      console.error("Erro ao salvar consulta:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Nova Consulta</CardTitle>
+        <CardDescription>
+          Registre os detalhes da consulta do paciente
+        </CardDescription>
       </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Motivo da Consulta</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: Consulta de rotina" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="symptoms"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sintomas</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Descreva os sintomas apresentados"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="reason"
+                name="weight"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Motivo da Consulta</FormLabel>
+                    <FormLabel>Peso (kg)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Informe o motivo da consulta" {...field} />
+                      <Input type="number" step="0.1" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -82,15 +136,12 @@ export function NewConsultationForm() {
 
               <FormField
                 control={form.control}
-                name="symptoms"
+                name="temperature"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sintomas</FormLabel>
+                    <FormLabel>Temperatura (°C)</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Descreva os sintomas apresentados"
-                        {...field}
-                      />
+                      <Input type="number" step="0.1" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -99,12 +150,12 @@ export function NewConsultationForm() {
 
               <FormField
                 control={form.control}
-                name="diagnosis"
+                name="heartRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Diagnóstico</FormLabel>
+                    <FormLabel>Freq. Cardíaca (bpm)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Informe o diagnóstico" {...field} />
+                      <Input type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -113,15 +164,12 @@ export function NewConsultationForm() {
 
               <FormField
                 control={form.control}
-                name="notes"
+                name="respiratoryRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Observações</FormLabel>
+                    <FormLabel>Freq. Respiratória (rpm)</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Observações adicionais"
-                        {...field}
-                      />
+                      <Input type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -129,89 +177,31 @@ export function NewConsultationForm() {
               />
             </div>
 
-            <div>
-              <h3 className="font-semibold mb-4">Sinais Vitais</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="weight"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Peso (kg)</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.1" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Observações</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Observações adicionais sobre a consulta"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                <FormField
-                  control={form.control}
-                  name="temperature"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Temperatura (°C)</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.1" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="heartRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Freq. Cardíaca (bpm)</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="respiratoryRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Freq. Respiratória (rpm)</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="bloodPressure"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pressão Arterial</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex: 120/80" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Salvando..." : "Salvar Consulta"}
+              </Button>
             </div>
-          </CardContent>
-          <CardFooter className="flex justify-end space-x-2">
-            <Button variant="outline" type="button">
-              Cancelar
-            </Button>
-            <Button type="submit">Salvar Consulta</Button>
-          </CardFooter>
-        </form>
-      </Form>
+          </form>
+        </Form>
+      </CardContent>
     </Card>
   );
 } 

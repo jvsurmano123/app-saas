@@ -3,14 +3,14 @@ export type PatientStatus = 'aguardando' | 'em_tratamento' | 'alta' | 'cancelado
 export interface Patient {
   id: string;
   name: string;
-  species: string;
+  species: 'dog' | 'cat';
   breed: string;
-  age: number;
   gender: 'male' | 'female';
-  ownerName: string;
-  ownerPhone: string;
-  ownerEmail: string;
-  status: PatientStatus;
+  status: 'waiting' | 'in_consultation' | 'exams' | 'surgery' | 'completed';
+  photo: string;
+  age: number;
+  allergies: string[];
+  chronicConditions: string[];
   createdAt: string;
   updatedAt: string;
   lastVisit?: string;
@@ -51,4 +51,71 @@ export interface NewPatientData {
     document: string;
     address: Owner['address'];
   };
+}
+
+export interface VitalSigns {
+  weight: number;
+  temperature: number;
+  heartRate: number;
+  respiratoryRate: number;
+  bloodPressure: string;
+}
+
+export interface Prescription {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions: string;
+  prescribedAt: Date;
+  prescribedBy: string;
+}
+
+export interface Exam {
+  id: string;
+  name: string;
+  requestedAt: Date;
+  requestedBy: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  results?: string;
+  attachments: string[];
+}
+
+export interface Consultation {
+  id: string;
+  date: Date;
+  veterinarian: string;
+  reason: string;
+  symptoms: string[];
+  diagnosis: string;
+  notes: string;
+  vitalSigns: VitalSigns;
+  prescriptions: Prescription[];
+  exams: Exam[];
+}
+
+export interface Vaccination {
+  id: string;
+  name: string;
+  date: Date;
+  nextDueDate: Date;
+  appliedBy: string;
+  batch: string;
+}
+
+export interface MedicalRecord {
+  id: string;
+  patientId: string;
+  patientName: string;
+  species: string;
+  breed: string;
+  age: number;
+  photo: string;
+  allergies: string[];
+  chronicConditions: string[];
+  consultations: Consultation[];
+  vaccinations: Vaccination[];
+  currentMedications: Prescription[];
+  alerts: string[];
 } 

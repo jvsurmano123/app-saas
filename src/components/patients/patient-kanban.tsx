@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Patient } from '@/types/patient';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 // Definição dos estados do fluxo de atendimento
 const WORKFLOW_STATES = {
@@ -68,6 +69,12 @@ interface PatientCardProps {
 }
 
 function PatientCard({ patient, index }: PatientCardProps) {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/dashboard/patients/${patient.id}`);
+  };
+
   return (
     <Draggable draggableId={patient.id} index={index}>
       {(provided) => (
@@ -76,13 +83,14 @@ function PatientCard({ patient, index }: PatientCardProps) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className="mb-3"
+          onClick={handleCardClick}
         >
-          <Card className="bg-white shadow-sm hover:shadow-md transition-shadow">
+          <Card className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${patient.name}`} />
+                    <AvatarImage src={patient.photo} />
                     <AvatarFallback>{patient.name[0]}</AvatarFallback>
                   </Avatar>
                   <div>
@@ -94,14 +102,19 @@ function PatientCard({ patient, index }: PatientCardProps) {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                    <DropdownMenuItem>Histórico</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/patients/${patient.id}`);
+                    }}>
+                      Ver detalhes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Editar</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Histórico</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -109,7 +122,7 @@ function PatientCard({ patient, index }: PatientCardProps) {
                 <Badge variant="outline" className="text-xs">
                   {patient.gender === 'male' ? 'Macho' : 'Fêmea'}
                 </Badge>
-                {patient.allergies && (
+                {patient.allergies && patient.allergies.length > 0 && (
                   <Badge variant="destructive" className="text-xs">
                     Alergias
                   </Badge>
