@@ -4,6 +4,7 @@ import { getPatients } from '@/services/patients';
 import { testSupabaseConnection } from '@/lib/supabase';
 import { Patient } from '@/types/patient';
 import { useQuery } from '@tanstack/react-query';
+import { mockPatients } from '@/lib/seed-data';
 
 interface PatientFilters {
   status?: string;
@@ -11,7 +12,11 @@ interface PatientFilters {
   breed?: string;
 }
 
-export function usePatients() {
+interface UsePatientProps {
+  view?: 'list' | 'kanban';
+}
+
+export function usePatients({ view = 'list' }: UsePatientProps = {}) {
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<PatientFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,29 +27,62 @@ export function usePatients() {
     isLoading,
     refetch: refreshPatients
   } = useQuery({
-    queryKey: ['patients', search, filters, currentPage],
+    queryKey: ['patients', search, filters, currentPage, view],
     queryFn: async () => {
-      const isConnected = await testSupabaseConnection();
-      
-      if (!isConnected) {
-        toast.error('Erro de conexão com o banco de dados');
-        return { patients: [], total: 0 };
+      // Usando dados mockados
+      let filteredPatients = [...mockPatients];
+
+      // Aplicar busca
+      if (search) {
+        const searchLower = search.toLowerCase();
+        filteredPatients = filteredPatients.filter(
+          patient =>
+            patient.name.toLowerCase().includes(searchLower) ||
+            patient.owner_name?.toLowerCase().includes(searchLower)
+        );
       }
 
-      try {
-        const data = await getPatients({
-          search,
-          filters,
-          page: currentPage,
-          limit: ITEMS_PER_PAGE
-        });
-        
-        return data;
-      } catch (error) {
-        console.error('Erro ao carregar pacientes:', error);
-        toast.error('Erro ao carregar pacientes');
-        return { patients: [], total: 0 };
+      // Aplicar filtros
+      if (filters.status) {
+        filteredPatients = filteredPatients.filter(
+          patient => patient.status === filters.status
+        );
       }
+      if (filters.species) {
+        filteredPatients = filteredPatients.filter(
+          patient => patient.species === filters.species
+        );
+      }
+      if (filters.breed) {
+        filteredPatients = filteredPatients.filter(
+          patient => patient.breed.toLowerCase() === filters.breed?.toLowerCase()
+        );
+      }
+
+      // Ordenar por data de criação (mais recentes primeiro)
+      filteredPatients.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      const total = filteredPatients.length;
+
+      // Se for visualização Kanban, retorna todos os pacientes
+      if (view === 'kanban') {
+        return {
+          patients: filteredPatients,
+          total
+        };
+      }
+
+      // Se for lista, aplica paginação
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      const paginatedPatients = filteredPatients.slice(start, end);
+
+      return {
+        patients: paginatedPatients,
+        total
+      };
     },
     staleTime: 1000 * 60 * 5, // Cache por 5 minutos
     keepPreviousData: true

@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Patient } from '@/types/patient';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Definição dos estados do fluxo de atendimento
 const WORKFLOW_STATES = {
@@ -88,7 +88,7 @@ function PatientCard({ patient, index }: PatientCardProps) {
                   <div>
                     <h4 className="text-sm font-semibold">{patient.name}</h4>
                     <p className="text-xs text-muted-foreground">
-                      {patient.species} • {patient.breed}
+                      {patient.species === 'dog' ? 'Cachorro' : 'Gato'} • {patient.breed}
                     </p>
                   </div>
                 </div>
@@ -124,7 +124,10 @@ function PatientCard({ patient, index }: PatientCardProps) {
 }
 
 export function PatientKanban({ patients, onPatientMove }: PatientKanbanProps) {
-  const [columns, setColumns] = useState(() => {
+  const [columns, setColumns] = useState<Record<string, typeof WORKFLOW_COLUMNS[0] & { patients: Patient[] }>>({});
+
+  // Atualiza as colunas quando os pacientes mudarem
+  useEffect(() => {
     const cols = WORKFLOW_COLUMNS.reduce((acc, column) => {
       acc[column.id] = {
         ...column,
@@ -132,8 +135,8 @@ export function PatientKanban({ patients, onPatientMove }: PatientKanbanProps) {
       };
       return acc;
     }, {} as Record<string, typeof WORKFLOW_COLUMNS[0] & { patients: Patient[] }>);
-    return cols;
-  });
+    setColumns(cols);
+  }, [patients]);
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;

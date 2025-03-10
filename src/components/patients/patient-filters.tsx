@@ -30,7 +30,11 @@ interface PatientFiltersProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'active', label: 'Ativo' },
+  { value: 'waiting', label: 'Aguardando' },
+  { value: 'in_consultation', label: 'Em Consulta' },
+  { value: 'exams', label: 'Exames' },
+  { value: 'surgery', label: 'Cirurgia' },
+  { value: 'completed', label: 'Concluído' },
   { value: 'inactive', label: 'Inativo' },
 ];
 
@@ -41,62 +45,54 @@ const SPECIES_OPTIONS = [
   { value: 'other', label: 'Outro' },
 ];
 
-const BREED_OPTIONS = {
-  dog: [
-    { value: 'golden', label: 'Golden Retriever' },
-    { value: 'labrador', label: 'Labrador' },
-    { value: 'poodle', label: 'Poodle' },
-    { value: 'other', label: 'Outro' },
-  ],
-  cat: [
-    { value: 'persian', label: 'Persa' },
-    { value: 'siamese', label: 'Siamês' },
-    { value: 'maine_coon', label: 'Maine Coon' },
-    { value: 'other', label: 'Outro' },
-  ],
-};
+const BREED_OPTIONS = [
+  // Cães
+  { value: 'labrador', label: 'Labrador' },
+  { value: 'golden retriever', label: 'Golden Retriever' },
+  { value: 'bulldog francês', label: 'Bulldog Francês' },
+  { value: 'poodle', label: 'Poodle' },
+  { value: 'shih tzu', label: 'Shih Tzu' },
+  { value: 'rottweiler', label: 'Rottweiler' },
+  { value: 'yorkshire', label: 'Yorkshire' },
+  { value: 'pastor alemão', label: 'Pastor Alemão' },
+  { value: 'cocker spaniel', label: 'Cocker Spaniel' },
+  // Gatos
+  { value: 'siamês', label: 'Siamês' },
+  { value: 'persa', label: 'Persa' },
+  { value: 'maine coon', label: 'Maine Coon' },
+  { value: 'ragdoll', label: 'Ragdoll' },
+  { value: 'sphynx', label: 'Sphynx' },
+  { value: 'angorá', label: 'Angorá' },
+];
 
 export function PatientFilters({ filters, onFiltersChange }: PatientFiltersProps) {
   const handleFilterChange = (key: keyof PatientFilters, value: string | undefined) => {
-    const newFilters = { ...filters };
-    
-    if (value === undefined) {
-      delete newFilters[key];
-    } else {
-      newFilters[key] = value;
-    }
-
-    // Se mudar a espécie, limpa a raça
-    if (key === 'species') {
-      delete newFilters.breed;
-    }
-
-    onFiltersChange(newFilters);
+    onFiltersChange({
+      ...filters,
+      [key]: value,
+    });
   };
 
   const clearFilters = () => {
     onFiltersChange({});
   };
 
-  const activeFiltersCount = Object.keys(filters).length;
+  const hasActiveFilters = Object.values(filters).some(Boolean);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="relative">
+        <Button variant="outline" size="sm" className="relative">
           <Filter className="mr-2 h-4 w-4" />
           Filtros
-          {activeFiltersCount > 0 && (
-            <span className="ml-2 rounded-full bg-primary w-5 h-5 text-xs flex items-center justify-center text-primary-foreground">
-              {activeFiltersCount}
-            </span>
+          {hasActiveFilters && (
+            <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-primary" />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[280px] p-4">
         <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Status</Label>
@@ -138,31 +134,30 @@ export function PatientFilters({ filters, onFiltersChange }: PatientFiltersProps
             </Select>
           </div>
 
-          {filters.species && BREED_OPTIONS[filters.species as keyof typeof BREED_OPTIONS] && (
-            <div className="space-y-2">
-              <Label>Raça</Label>
-              <Select
-                value={filters.breed}
-                onValueChange={(value) => handleFilterChange('breed', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione uma raça" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todas</SelectItem>
-                  {BREED_OPTIONS[filters.species as keyof typeof BREED_OPTIONS].map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label>Raça</Label>
+            <Select
+              value={filters.breed}
+              onValueChange={(value) => handleFilterChange('breed', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma raça" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todas</SelectItem>
+                {BREED_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          {activeFiltersCount > 0 && (
+          {hasActiveFilters && (
             <Button
               variant="ghost"
+              size="sm"
               className="w-full"
               onClick={clearFilters}
             >

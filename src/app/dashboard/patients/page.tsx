@@ -12,8 +12,13 @@ import { Plus, LayoutGrid, List } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { updatePatient } from '@/services/patients';
+import { toast } from 'sonner';
+import { mockPatients } from '@/lib/seed-data';
 
 function PatientsContent() {
+  const [view, setView] = useState<'list' | 'kanban'>('kanban');
+
   const {
     patients,
     isLoading,
@@ -25,18 +30,34 @@ function PatientsContent() {
     setCurrentPage,
     totalPages,
     refreshPatients,
-  } = usePatients();
-
-  const [view, setView] = useState<'list' | 'kanban'>('kanban');
+  } = usePatients({ view });
 
   useEffect(() => {
     refreshPatients();
-  }, [search, filters, currentPage]);
+  }, [search, filters, currentPage, view]);
 
   const handlePatientMove = async (patientId: string, newStatus: string) => {
-    // TODO: Implementar atualização do status do paciente no banco de dados
-    console.log(`Movendo paciente ${patientId} para ${newStatus}`);
-    await refreshPatients();
+    try {
+      // Como estamos usando dados mockados, vamos apenas simular a atualização
+      // Em produção, você usaria a função updatePatient
+      // await updatePatient(patientId, { status: newStatus });
+      
+      // Atualiza o status do paciente nos dados mockados
+      const patientIndex = mockPatients.findIndex(p => p.id === patientId);
+      if (patientIndex !== -1) {
+        mockPatients[patientIndex] = {
+          ...mockPatients[patientIndex],
+          status: newStatus as any,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      
+      toast.success('Status do paciente atualizado com sucesso!');
+      await refreshPatients();
+    } catch (error) {
+      console.error('Erro ao atualizar status do paciente:', error);
+      toast.error('Erro ao atualizar status do paciente');
+    }
   };
 
   return (

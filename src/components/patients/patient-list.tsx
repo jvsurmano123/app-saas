@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 interface PatientListProps {
   patients: Patient[];
@@ -38,12 +39,20 @@ export function PatientList({
 }: PatientListProps) {
   const getStatusBadge = (status: string) => {
     const variants = {
-      active: 'success',
-      inactive: 'secondary',
+      waiting: 'warning',
+      in_consultation: 'default',
+      exams: 'secondary',
+      surgery: 'destructive',
+      completed: 'success',
+      inactive: 'outline',
     } as const;
 
     const labels = {
-      active: 'Ativo',
+      waiting: 'Aguardando',
+      in_consultation: 'Em Consulta',
+      exams: 'Exames',
+      surgery: 'Cirurgia',
+      completed: 'Concluído',
       inactive: 'Inativo',
     } as const;
 
@@ -100,6 +109,17 @@ export function PatientList({
     );
   }
 
+  const getSpeciesLabel = (species: string) => {
+    const labels = {
+      dog: 'Cachorro',
+      cat: 'Gato',
+      bird: 'Pássaro',
+      other: 'Outro',
+    } as const;
+
+    return labels[species as keyof typeof labels] || species;
+  };
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border">
@@ -119,11 +139,11 @@ export function PatientList({
             {patients.map((patient) => (
               <TableRow key={patient.id}>
                 <TableCell className="font-medium">{patient.name}</TableCell>
-                <TableCell>{patient.species}</TableCell>
+                <TableCell>{getSpeciesLabel(patient.species)}</TableCell>
                 <TableCell>{patient.breed}</TableCell>
                 <TableCell>{patient.owner_name}</TableCell>
                 <TableCell>{getStatusBadge(patient.status)}</TableCell>
-                <TableCell>{formatDate(patient.created_at)}</TableCell>
+                <TableCell>{formatDate(patient.createdAt)}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -133,7 +153,11 @@ export function PatientList({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/patients/${patient.id}`}>
+                          Ver detalhes
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Editar</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive">
                         Excluir
